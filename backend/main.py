@@ -96,16 +96,16 @@ CURRENT_WORKSPACE_DIR.mkdir(exist_ok=True)
 # 쿠버네티스 상태 확인용
 @app.get("/healthz")
 async def healthz():
-	return {"status": "ok"}
+    return {"status": "ok"}
 
 @app.get("/readyz")
 async def readyz():
-	try:
-		with engine.connect() as conn:
-			conn.exec_driver_sql("SELECT 1")
-	except Exception:
-		raise HTTPException(status_code=503, detail="db not ready")
-	return {"status": "ready"}
+    try:
+        with engine.connect() as conn:
+            conn.exec_driver_sql("SELECT 1")
+    except Exception:
+        raise HTTPException(status_code=503, detail="db not ready")
+    return {"status": "ready"}
 
 
 # ----------------------------------------------------
