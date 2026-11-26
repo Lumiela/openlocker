@@ -94,7 +94,7 @@ export default function App() {
 
   const fetchModels = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/models');
+      const res = await fetch('/api/models');
       const data = await res.json();
       if (data.models && data.models.length > 0) {
         setModels(data.models);
@@ -107,7 +107,7 @@ export default function App() {
 
   const fetchChatSessions = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/sessions?type=chat');
+      const res = await fetch('/api/sessions?type=chat');
       const data: Session[] = await res.json();
       setChatSessions(data);
       if (data.length > 0 && !activeChatSessionId) {
@@ -120,7 +120,7 @@ export default function App() {
 
   const fetchWsSessions = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/sessions?type=workspace');
+      const res = await fetch('/api/sessions?type=workspace');
       const data: Session[] = await res.json();
       setWsSessions(data);
       if (data.length > 0 && !activeWsSessionId) {
@@ -133,7 +133,7 @@ export default function App() {
 
   const fetchSessionMessages = async (sessionId: string, mode: 'chat' | 'workspace') => {
     try {
-      const res = await fetch(`http://localhost:8000/api/sessions/${sessionId}/messages`);
+      const res = await fetch(`/api/sessions/${sessionId}/messages`);
       const data = await res.json();
       const loadedMessages: Message[] = data.map((msg: any) => ({
         id: msg.id,
@@ -153,7 +153,7 @@ export default function App() {
   const handleCreateSession = async (mode: 'chat' | 'workspace') => {
     try {
       const titlePrefix = mode === 'chat' ? 'Chat Session' : 'WS Task';
-      const res = await fetch('http://localhost:8000/api/sessions', {
+      const res = await fetch('/api/sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -180,7 +180,7 @@ export default function App() {
 
   const fetchWorkspaceFiles = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/workspace/files');
+      const res = await fetch('/api/workspace/files');
       const data = await res.json();
       if (data.files) setWorkspaceFiles(data.files);
       if (data.directory) setWorkspaceDir(data.directory);
@@ -192,8 +192,8 @@ export default function App() {
   const fetchBrowsePath = async (targetPath?: string) => {
     try {
       const url = targetPath 
-        ? `http://localhost:8000/api/workspace/browse?path=${encodeURIComponent(targetPath)}`
-        : 'http://localhost:8000/api/workspace/browse';
+        ? `/api/workspace/browse?path=${encodeURIComponent(targetPath)}`
+        : '/api/workspace/browse';
       const res = await fetch(url);
       const data = await res.json();
       setBrowseCurrentPath(data.current_path);
@@ -211,7 +211,7 @@ export default function App() {
 
   const handleConfirmSelectDirectory = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/workspace/load', {
+      const res = await fetch('/api/workspace/load', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ target_path: browseCurrentPath })
@@ -236,7 +236,7 @@ export default function App() {
     setSelectedFilePath(filePath);
     setIsLoadingFile(true);
     try {
-      const res = await fetch(`http://localhost:8000/api/workspace/file-content?path=${encodeURIComponent(filePath)}`);
+      const res = await fetch(`/api/workspace/file-content?path=${encodeURIComponent(filePath)}`);
       if (!res.ok) {
         const errorData = await res.json();
         setSelectedFileContent(`// [오류] ${errorData.detail || '파일을 불러올 수 없습니다.'}`);
@@ -284,7 +284,7 @@ export default function App() {
     };
 
     const eventSource = new EventSource(
-      `http://localhost:8000/api/agent/stream?prompt=${encodeURIComponent(currentInput)}&model=${encodeURIComponent(selectedModel)}&session_id=${currentSessionId}`
+      `/api/agent/stream?prompt=${encodeURIComponent(currentInput)}&model=${encodeURIComponent(selectedModel)}&session_id=${currentSessionId}`
     );
 
     eventSource.onmessage = (event: MessageEvent) => {
