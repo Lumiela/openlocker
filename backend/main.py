@@ -23,7 +23,8 @@ DATA_DIR = Path("./data").resolve()
 DATA_DIR.mkdir(exist_ok=True)
 
 DB_PATH = DATA_DIR / "nlabs_agent.db"
-DATABASE_URL = f"sqlite:///{DB_PATH}"
+DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{DB_PATH}")
+IS_SQLITE = DATABASE_URL.startswith("sqlite")
 
 class ChatSession(SQLModel, table=True):
     __table_args__ = {"extend_existing": True}
@@ -44,15 +45,16 @@ class ChatMessage(SQLModel, table=True):
     created_at: str = Field(default_factory=lambda: datetime.now().isoformat())
 
 engine = create_engine(
-    DATABASE_URL, 
-    connect_args={"check_same_thread": False},
-    execution_options={"isolation_level": "AUTOCOMMIT"}
+    DATABASE_URL,
+    connect_args={"check_same_thread": False} if IS_SQLITE else {},
+    execution_options={"isolation_level": "AUTOCOMMIT"},
+    pool_pre_ping=True,
 )
 
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
     with engine.connect() as conn:
-        conn.exec_driver_sql("PRAGMA journal_mode=WAL;")
+        if IS_SQLITE: conn.exec_driver_sql("PRAGMA journal_mode=WAL;")
         # 기존 DB 호환용 컬럼 추가 (type 컬럼 부재 시 스키마 마이그레이션)
         try:
             conn.exec_driver_sql("ALTER TABLE chatsession ADD COLUMN type VARCHAR DEFAULT 'chat';")
