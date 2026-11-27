@@ -17,6 +17,8 @@ spec:
       labels:
         app: openlocker
     spec:
+      imagePullSecrets:
+        - name: ghcr-pull
       securityContext:
         runAsNonRoot: true
         runAsUser: 10001
@@ -24,7 +26,7 @@ spec:
         fsGroup: 10001
       containers:
         - name: openlocker
-          image: openlocker:0.2
+          image: ghcr.io/lumiela/openlocker:sha-6a09a21
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
