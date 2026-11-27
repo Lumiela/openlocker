@@ -7,3 +7,4 @@ resources:
   - 30-deployment.yaml
   - 40-service.yaml
   - 50-ingress.yaml
+  - 90-prune-test.yaml
