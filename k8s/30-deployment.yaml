@@ -26,7 +26,7 @@ spec:
         fsGroup: 10001
       containers:
         - name: openlocker
-          image: ghcr.io/lumiela/openlocker:sha-6a09a21
+          image: ghcr.io/lumiela/openlocker:sha-0c4d01a
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
