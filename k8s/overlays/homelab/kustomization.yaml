@@ -4,4 +4,4 @@ resources:
   - ../../base
 images:
   - name: ghcr.io/lumiela/openlocker
-    newTag: sha-f90daf6
+    newTag: sha-31ddd1a
