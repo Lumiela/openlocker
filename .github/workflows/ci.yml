@@ -76,3 +76,30 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
+
+  update-tag:
+    needs: build
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.TAG_PUSH_TOKEN }}
+
+      - name: Set image tag in overlay
+        run: |
+          TAG="sha-${GITHUB_SHA::7}"
+          sed -i "s/newTag: .*/newTag: ${TAG}/" k8s/overlays/homelab/kustomization.yaml
+          git diff
+
+      - name: Commit and push
+        run: |
+          if git diff --quiet; then
+            echo "no change"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "k8s: image sha-${GITHUB_SHA::7} [auto]"
+          git push
